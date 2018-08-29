@@ -3,8 +3,14 @@ pragma solidity ^0.4.2;
 import "./Publisher.sol";
 
 contract Document {
-    address owner;
-    string name;       
+    address public owner;
+    string public name;  
+    bool public isPublished;
+    bool public isIssued;
+    bool public isPresented;
+    address public issuedTo;
+    address public presentedTo;
+
     Publisher publisher;
 
     constructor(address _publisher, address _owner, string _name) public {
@@ -18,17 +24,8 @@ contract Document {
         _;
     }
 
-    function publish(address _to)  public ownerOnly {
-        publisher.publish(address(this), _to);
-    }
-
-    function getName() public view returns (string) {
-        return name;
-    }
-
-    function getOwner() public view returns (address) {
-        return owner;
+    function publish(address[] _to)  public ownerOnly {
+        publisher.publish(address(this), msg.sender, _to);
+        isPublished = true;
     }
 }
-
-
