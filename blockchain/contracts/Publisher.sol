@@ -12,6 +12,8 @@ contract Publisher {
     mapping(address => uint[]) publishedToPublications;    
     mapping(address => uint[]) documentToPublications;
 
+    event PublicationsCreated(uint[] publications);
+
     function getPublication(uint index) public view returns (address document, address by, address to, uint when) {
         Publication storage publication = publications[index];
         return (publication.document, publication.by, publication.to, publication.when);
@@ -52,10 +54,10 @@ contract Publisher {
     }
 
     function isDocumentPublished(address _document) public view returns (bool) {
-        documentToPublications[_document].length > 0;
+        return documentToPublications[_document].length > 0;
     }
 
-    function isDocumentPublished(address _document, address _by, address _to) public view returns (bool) {
+    function isPublished(address _document, address _by, address _to) public view returns (bool) {
         //take the optimum lookup path
         uint[] storage publicationsByPublished = publishedToPublications[_to];
         uint[] storage publicationsByDocument = documentToPublications[_document];
@@ -76,16 +78,20 @@ contract Publisher {
         return false;
     }
 
-    function publish(address _document, address _by, address[] _to) public {
+    function publish(address _document, address _by, address[] _to) public  returns (uint[]){
 
+        uint[] memory created = new uint[](_to.length);
         for (uint i = 0; i < _to.length; i++) {
             address to = _to[i];
-            if (isDocumentPublished(_document, _by, to) == false){
+            if (isPublished(_document, _by, to) == false){
                 publications.push(Publication(_document, _by, to, now));
                 uint index = publications.length-1;
                 documentToPublications[_document].push(index);
                 publishedToPublications[to].push(index);
+                created[i] = index;
             }
         }
+        emit PublicationsCreated(created);
+        return created;
     }
 }
