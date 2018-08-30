@@ -7,7 +7,7 @@ contract Documate {
 
     address server;
     address publisher;
-    address[] documents;
+    address[] public documents;
 
     event DocumentCreated(address document);
 
@@ -16,17 +16,13 @@ contract Documate {
         server = _server;
     }
 
-    function testSignature(bytes32 documentHash, bytes memory signature) public view returns (address){
-        bytes32 message = prefixed(keccak256(abi.encodePacked(documentHash, msg.sender, address(this))));
-       // return splitSignature(signature);
-        return recoverSigner(message, signature);
-
-    }
-    function createDocument(string name, bytes32 documentHash, bytes memory signature) public returns (address) {
-
-        bytes32 message = prefixed(keccak256(abi.encodePacked(documentHash, msg.sender, address(this))));
+    modifier validSignature(bytes32 document, bytes memory signature) {
+        bytes32 message = prefixed(keccak256(abi.encodePacked(document, msg.sender, address(this))));
         require(recoverSigner(message, signature) == server, "Invalid server signature");
-
+        _;
+    }
+    function createDocument(string name, bytes32 documentHash, bytes memory signature) public validSignature(documentHash,signature) 
+         returns (address) {
         Document document = (new Document(publisher,msg.sender,name ));
         documents.push(document);
         emit DocumentCreated(document);
@@ -45,10 +41,6 @@ contract Documate {
             v := byte(0, mload(add(sig, 96)))
         }
         return (v, r, s);
-    }
-
-    function getDocuments() public view returns (address[]) {
-        return documents;
     }
 
     function recoverSigner(bytes32 message, bytes memory sig) internal pure returns (address)
