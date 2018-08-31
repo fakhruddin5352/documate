@@ -3,13 +3,19 @@ pragma solidity ^0.4.2;
 import "./Publisher.sol";
 
 contract Document {
+
+    struct Presentation {
+        address to;
+        uint256 at;
+    }
+
     address public owner;
     string public name;  
     bool public published;
     bool public issued;
-    bool public presented;
+    uint256 issuedAt;
     address public issuedTo;
-    address[] public presentedTo;
+    mapping(address => Presentation[]) presentations;
 
     Publisher publisher;
 
@@ -19,6 +25,80 @@ contract Document {
         owner = _owner;
     }
 
+    function issue(address _to) public {
+        require(!published, "document_is_published");
+        require(msg.sender == owner, "issuer_is_not_owner");
+        require(_to != owner, "issuee_is_owner");
+        
+        issuedTo = _to;
+        issued = true;
+    }
+
+    function revokeIssuance() public {
+        require(owner == msg.sender, "revoker_is_not_owner");
+        if (issued) {
+            presentations[issuedTo].length = 0;
+            issued = false;
+            delete issuedTo;
+        }
+    }
+
+    function present(address[] _to) public {
+        require(msg.sender == owner || issuedTo == msg.sender, "document_is_not_issued_or_owned");
+
+        if (_to.length == 0 )
+            return;
+    
+        for (uint i = 0; i<_to.length; i++) {
+            bool exists = false;
+            Presentation[] storage presentedTo = presentations[msg.sender];
+            for (uint j = 0; j<presentedTo.length; j++) {
+                if (presentedTo[j].to == _to[i] ) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                presentations[msg.sender].push(Presentation(_to[i],now));
+            }
+        }
+    }
+
+    function revokePresentation(address[] _to) public {
+        for (uint i = 0; i<_to.length; i++) {
+            Presentation[] storage presentedTo = presentations[msg.sender];
+            for (uint j = 0; j<presentedTo.length; j++) {
+                if (presentedTo[j].to == _to[i]) {
+                    presentedTo[j] = presentedTo[presentedTo.length-1];
+                    presentedTo.length--;
+                    break;
+                }
+            }
+          
+        }   
+    }
+
+    function presented() public view returns (bool) {
+        return presentedBy(msg.sender);
+    }
+ 
+    function presentedBy(address _sender) public view returns  (bool) {
+        Presentation[] storage ps = presentations[_sender];
+        return ps.length > 0;
+    }
+
+    function presentedTo() public view returns (address[]) {
+        return presentedToBy(msg.sender);
+    }
+
+    function presentedToBy(address _sender) public view returns (address[]) {
+        Presentation[] storage ps = presentations[_sender];
+        address[] memory to = new address[](ps.length);
+        for (uint j = 0; j<ps.length; j++) {
+            to[j] = ps[j].to;
+        }
+        return to;
+    }
 
     modifier cannotBeSelf(address[] _to) {
         for (uint i = 0; i < _to.length; i++) {
@@ -27,38 +107,15 @@ contract Document {
         _;
     }
 
-    function issue(address _to) public {
-        require(!published, "document_is_published");
-        require(msg.sender == owner, "owner_is_not_issuer");
-        require(_to != owner, "issuee_is_owner");
-        
-        issuedTo = _to;
-        issued = true;
-    }
-
-    function present(address[] _to) public {
-        require(msg.sender == owner || issuedTo == msg.sender, "document_is_not_issued_or_owned");
-        presented = true;
-        for (uint i = 0; i<_to.length; i++) {
-            bool exists = false;
-            for (uint j = 0; j<presentedTo.length; j++) {
-                if (presentedTo[j] == _to[i]) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                presentedTo.push(_to[i]);
-            }
-        }
-    }
-
-    function getPresentedTo() public view returns (address[]) {
-        return presentedTo;
-    }
-
     function publish(address[] _to)  public cannotBeSelf(_to) {
-        publisher.publish(address(this), msg.sender, _to);
+        require(!issued, "document_is_issued");
+        require(!presented(), "document_is_presented");
+        require(msg.sender == owner || publisher.isDocumentPublishedTo(address(this), msg.sender), "document_is_not_issued_or_owned");
+
+        if (_to.length == 0)
+            return;
+        
         published = true;
+        publisher.publish(address(this), msg.sender, _to);
     }
 }
