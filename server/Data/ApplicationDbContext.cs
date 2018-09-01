@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Document.Data {
+namespace Documate.Data {
     public class ApplicationDbContext : DbContext {
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base (options) { }
+
+        public DbSet<Document> Documents{get;set;}
     }
 }
