@@ -11,7 +11,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace Documate.Helpers
 {
-public static class FileStreamingHelper
+public static class RequestStreamExtensions
 {
 	private static readonly FormOptions _defaultFormOptions = new FormOptions();
  
