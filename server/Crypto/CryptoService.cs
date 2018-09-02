@@ -9,7 +9,7 @@ using Nethereum.Signer;
 using Nethereum.Web3;
 
 namespace Documate.Crypto {
-    public class CryptoService : ICryptoService {
+    class CryptoService : ICryptoService {
 
         private readonly ILogger logger;
 
@@ -37,14 +37,27 @@ namespace Documate.Crypto {
             };
         }
 
-        public string EcRecover(string signature, byte[] data) {
+        public RecoverModel EcRecover(string sender, string signature, byte[] data) {
             var ethereumSigner = new EthereumMessageSigner();
             var hash = Web3.Sha3(System.Convert.ToBase64String(data)).EnsureHexPrefix();
+            return EcRecover(sender, signature, hash);
 
-            var signer =  ethereumSigner.EcRecover(hash.HexToByteArray(),signature);
-            logger.LogTrace("Hash {0} , Signature {1}, Signer {2}", hash,signature,signer);
-            return signer.ToLowerInvariant();
         }
+
+        public RecoverModel EcRecover(string sender, string signature, string hash)
+        {
+            var ethereumSigner = new EthereumMessageSigner();
+            var signer = ethereumSigner.EcRecover(hash.HexToByteArray(), signature);
+            logger.LogDebug("Hash {0} , Signature {1}, Signer {2}, Sender {3}", hash, signature, signer, sender);
+  
+            return new RecoverModel
+            {
+                Signer = signer.ToLowerInvariant(),
+                Hash = hash,
+                Valid = string.Equals(signer, sender, StringComparison.OrdinalIgnoreCase)
+            };
+        }
+
         public string Sign(Model model, string privateKey ) {
             var signer = new EthereumMessageSigner();
             var bytes = EncodedPacked(model).HexToByteArray();

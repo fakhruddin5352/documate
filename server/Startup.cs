@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Documate.Crypto;
 using Documate.Data;
+using Documate.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,9 +30,9 @@ namespace Documate
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options => 
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddSingleton<ICryptoService,CryptoService>();
+            services.AddCrypto();
+            services.AddLocalStorage(options => options.UsePath(Configuration["Storage:Path"]) );
+            services.AddData(options => options.UseConnection(Configuration.GetConnectionString("DefaultConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
