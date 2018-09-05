@@ -12,23 +12,16 @@ namespace Documate.Storage {
             this.logger = logger;
         }
 
-        public async Task<bool> Load (string hash, Stream stream) {
+        public Task<Stream> Load (string hash) {
             string fullPath = string.Empty;
-            try {
+
             fullPath = Path.Combine (path, hash);
             if (!File.Exists (fullPath)) {
                 logger.LogError ("File {0} does not exists for hash {1}", fullPath, hash);
-                return false;
+                throw new FileNotFoundException($"File does not exists for hash {hash}");
             }
 
-                using (FileStream fileStream = new FileStream (fullPath, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                    await fileStream.CopyToAsync (stream);
-                }
-            } catch (Exception ex) {
-                logger.LogError (ex, "Failed loading file {0} for hash {1}", fullPath, hash);
-                return false;
-            }
-            return true;
+            return Task.FromResult<Stream>(new FileStream (fullPath, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
         public async Task<bool> Store (string hash, Stream stream) {

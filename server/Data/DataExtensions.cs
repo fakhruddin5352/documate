@@ -8,12 +8,12 @@ namespace Documate.Data
     public static class DataExtensions
     {
         public static void AddData(this IServiceCollection services, Func<DataOptionsBuilder, DataOptionsBuilder> options) {
-            var builder = options(new DataOptionsBuilder());
+            var builder = new DataOptionsBuilder();
+            options(builder);
+            var dataOptions = builder.Build();
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(op => 
-                op.UseNpgsql(builder.Connection));
+                op.UseNpgsql(dataOptions.Connection));
             services.AddScoped<IDataService,DataService>();
-
-
         }
     }
 }

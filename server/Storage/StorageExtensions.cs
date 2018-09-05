@@ -7,9 +7,9 @@ namespace Documate.Storage {
     public static class StorageExtensions {
 
         public static void AddLocalStorage (this IServiceCollection services, Func<LocalStorageOptionsBuilder, LocalStorageOptionsBuilder> localStorageOptions) {
-            var builder =  localStorageOptions(new LocalStorageOptionsBuilder());
+            var options  = localStorageOptions(new LocalStorageOptionsBuilder()).Build();
             services.AddSingleton<IStorageService> (provider =>
-                new LocalStorageService (builder.Path, provider.GetService<ILogger<LocalStorageService>> ())
+                new LocalStorageService (options.Path, provider.GetService<ILogger<LocalStorageService>> ())
             );
         }
     }

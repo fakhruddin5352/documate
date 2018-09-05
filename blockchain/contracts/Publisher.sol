@@ -94,4 +94,5 @@ contract Publisher {
         emit PublicationsCreated(created);
         return created;
     }
+
 }

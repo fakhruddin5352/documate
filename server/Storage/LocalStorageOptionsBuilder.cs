@@ -4,7 +4,11 @@ namespace Documate.Storage {
 
         public LocalStorageOptionsBuilder UsePath (string path) {
             Path = path;
-            return new LocalStorageOptionsBuilder{Path = path};
+            return this;
+        }
+
+        internal LocalStorageOptions Build() {
+            return new LocalStorageOptions(Path);
         }
 
     }

@@ -8,17 +8,26 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Documate
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Build().Run();
+namespace Documate {
+    public class Program {
+        public static void Main (string[] args) {
+            CreateWebHostBuilder (args).Build ().Run ();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder (string[] args) =>
+            WebHost.CreateDefaultBuilder (args)
+            .ConfigureAppConfiguration ((hostingContext, config) => {
+                config.SetBasePath (Directory.GetCurrentDirectory ());
+                config.AddJsonFile ("appsettings.json", optional : true, reloadOnChange : true)
+                    .AddJsonFile ($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional : true, reloadOnChange : true);
+                config.AddEnvironmentVariables ();
+                config.AddCommandLine (args);
+                if (hostingContext.HostingEnvironment.IsDevelopment()) {
+                    var parent = Path.GetDirectoryName(Directory.GetCurrentDirectory());
+
+                    config.AddJsonFile(Path.Combine(parent,"shared/settings.json"), false, true);
+                }
+            })
+            .UseStartup<Startup> ();
     }
 }

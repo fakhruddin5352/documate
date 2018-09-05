@@ -278,4 +278,35 @@ contract('Document', accounts => {
 
     });
 
+    it('should be viewable if owned', async () => {
+        const canView = await document.canView.call(context.sender);
+        assert.isTrue(canView, 'document should be viewed if owned');
+    });
+    it('should be viewable if issued', async () => {
+        const issuee = accounts[2];
+        await document.issue(issuee);
+        const canView = await document.canView.call(issuee);
+        assert.isTrue(canView, 'document should be viewed if issued');
+    });
+    it('should be viewable if published', async () => {
+        const publishee = accounts[2];
+        await document.publish([publishee]);
+        const canView = await document.canView.call(publishee);
+        assert.isTrue(canView, 'document should be viewed if published');
+    });
+    it('should be viewable if presented', async () => {
+        const presentee = accounts[2];
+        await document.issue(presentee);
+        const canView = await document.canView.call(presentee);
+        assert.isTrue(canView, 'document should be viewed if presented');
+    });
+    it('should not be viewable if either not owner or issued or presented or published', async () => {
+        assert.notEqual((await document.issuedTo.call(),accounts[2]));
+        assert.notEqual((await document.owner.call(),accounts[2]));
+        assert.isFalse((await document.presentedToByAnyone.call(accounts[2])));
+        assert.isFalse((await context.publisher.isDocumentPublishedTo.call(document.address, accounts[2])));
+        const canView = await document.canView.call(accounts[2]);
+        assert.isFalse(canView, 'document should be viewed if presented');
+    });
+    
 });

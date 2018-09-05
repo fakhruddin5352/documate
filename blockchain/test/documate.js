@@ -21,6 +21,7 @@ contract('Documate', accounts => {
         const documentContract = Document.at(documentCreateEvent.args.document);
         let createdDocumentName = await documentContract.name.call();
         assert.equal(name, createdDocumentName,  'name of the created document should be the same as the one passed');    
+        assert.equal((await documentContract.hash.call()), document, 'document hash not the same as passed' );
     });
 
     it('should fail on mismatch of document and signature', async () => {
@@ -79,7 +80,16 @@ contract('Documate', accounts => {
         const receipt = await context.documate.createDocument('Document1', document, sig);
         const documentCreateEvent = receipt.logs.find(x => x.event == 'DocumentCreated' );
         const documentAddr = documentCreateEvent.args.document;
-        const createdDocument = await context.documate.documents.call(0);
+        const createdDocument = await context.documate.documents.call(document);
         assert.equal(createdDocument, documentAddr, 'documents should return the list of the created documents');
+    });
+
+    it('should determine whether a document can be viewed by an account', async () => {
+        const sig = context.serverSign(document );
+        const receipt = await context.documate.createDocument('Document1', document, sig);
+        let canView = await context.documate.canViewDocument.call(accounts[0], document);
+        assert.isTrue(canView, 'document should be viewed');
+        canView = await context.documate.canViewDocument.call(accounts[2], document);
+        assert.isFalse(canView, 'document should be not viewed');
     });
 });

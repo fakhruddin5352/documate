@@ -14,9 +14,11 @@ namespace Documate.Data
         [Column(TypeName="character(40)")]
         public string Owner{get;set;}
         public DateTime When{get;set;}
-        public bool Verified{get;set;}
+
         [MaxLength(256)]
         public string Name{get;set;}
+        [Column(TypeName="character(40)")]
+        public bool Verified{get;set;}
 
     }
 }

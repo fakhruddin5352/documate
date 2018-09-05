@@ -17,8 +17,8 @@ namespace Documate.Migrations
                     Hash = table.Column<string>(type: "character(64)", nullable: true),
                     Owner = table.Column<string>(type: "character(40)", nullable: true),
                     When = table.Column<DateTime>(nullable: false),
-                    Verified = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(maxLength: 256, nullable: true)
+                    Name = table.Column<string>(maxLength: 256, nullable: true),
+                    Verified = table.Column<string>(type: "character(40)", nullable: false)
                 },
                 constraints: table =>
                 {

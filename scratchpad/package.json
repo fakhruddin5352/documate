@@ -1,0 +1,19 @@
+{
+  "name": "scratchpad",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "document": "node index.js",
+    "init": "node init.js",
+    "abi": "node abiExtratctor.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/web3": "^1.0.3",
+    "request": "^2.88.0",
+    "web3": "^0.20.7"
+  }
+}

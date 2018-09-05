@@ -14,9 +14,14 @@ namespace Documate.Data {
             this.dbContext = dbContext;
             this.logger = logger;
         }
-        public Task<Document> Load (string hash) 
+        public async Task<Document> Load (string hash) 
         {
-            return dbContext.Documents.SingleOrDefaultAsync(x=>x.Hash == hash);
+            var document =  await dbContext.Documents.SingleOrDefaultAsync(x=>string.Equals(x.Hash,hash.RemoveHexPrefix(),StringComparison.OrdinalIgnoreCase));
+            if (document != null) {
+                document.Hash = document.Hash.EnsureHexPrefix();
+                document.Owner = document.Owner.EnsureHexPrefix();
+            }
+            return document;
         }
 
         public async Task Save (Document document) {
