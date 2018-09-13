@@ -6,6 +6,7 @@ using Documate.BlockChain;
 using Documate.Configuration;
 using Documate.Crypto;
 using Documate.Data;
+using Documate.Document;
 using Documate.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,7 @@ namespace Documate {
                 .UseDocumateApi (contractsConfig.Documate.ABI)
                 .UserDocumateAddress (contractsConfig.Documate.Address)
             );
+            services.AddScoped<IDocumentService,DocumentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

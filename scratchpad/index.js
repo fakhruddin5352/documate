@@ -50,7 +50,7 @@ events.watch(function (error, event) {
     if (!error)
         if (event.event == 'DocumentCreated') {
             console.log('Document address ', event.args.document);
-            request(downloadOptions).pipe(fs.createWriteStream('file'));
+            request(downloadOptions).pipe(fs.createWriteStream('file.jpeg'));
 
         }
 });
