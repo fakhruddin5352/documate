@@ -14,11 +14,11 @@ namespace Documate.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    Hash = table.Column<string>(type: "character(64)", nullable: true),
-                    Owner = table.Column<string>(type: "character(40)", nullable: true),
+                    Owner = table.Column<string>(type: "character(40)", nullable: false),
                     When = table.Column<DateTime>(nullable: false),
-                    Name = table.Column<string>(maxLength: 256, nullable: true),
-                    Verified = table.Column<string>(type: "character(40)", nullable: false)
+                    Name = table.Column<string>(maxLength: 256, nullable: false),
+                    Verified = table.Column<string>(type: "character(40)", nullable: false),
+                    Hash = table.Column<string>(type: "character(64)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,20 +26,14 @@ namespace Documate.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_Hash",
-                table: "Documents",
-                column: "Hash",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Documents_Owner",
-                table: "Documents",
-                column: "Owner");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Documents_When",
                 table: "Documents",
                 column: "When");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_Hash",
+                table: "Documents",
+                column: "Hash");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

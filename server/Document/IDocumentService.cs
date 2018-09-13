@@ -5,14 +5,15 @@ using Documate.BlockChain;
 using Documate.Crypto;
 using Documate.Data;
 using Documate.Storage;
+using Documate.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Nethereum.Hex.HexConvertors.Extensions;
 
 namespace Documate.Document {
     public interface IDocumentService {
-        Task<DocumentData> Load (string sender, string signature, string hash);
+        Task<DocumentData> Load (Address sender, Signature signature, Hash hash);
 
-        Task<DocumentInfo> Store (string sender, string hash, byte[] data, string name);
+        Task<DocumentInfo> Store (Address sender, Signature signature, byte[] data, string name);
 
     }
 

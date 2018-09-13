@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Documate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180904165118_document-table")]
+    [Migration("20180913205353_document-table")]
     partial class documenttable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,13 +26,12 @@ namespace Documate.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Hash")
-                        .HasColumnType("character(64)");
-
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(256);
 
                     b.Property<string>("Owner")
+                        .IsRequired()
                         .HasColumnType("character(40)");
 
                     b.Property<string>("Verified")
@@ -42,14 +41,16 @@ namespace Documate.Migrations
 
                     b.Property<DateTime>("When");
 
+                    b.Property<string>("hash")
+                        .IsRequired()
+                        .HasColumnName("Hash")
+                        .HasColumnType("character(64)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Hash")
-                        .IsUnique();
-
-                    b.HasIndex("Owner");
-
                     b.HasIndex("When");
+
+                    b.HasIndex("hash");
 
                     b.ToTable("Documents");
                 });

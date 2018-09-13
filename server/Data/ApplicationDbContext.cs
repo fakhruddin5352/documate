@@ -1,3 +1,4 @@
+using Documate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Documate.Data {
@@ -7,9 +8,9 @@ namespace Documate.Data {
         public DbSet<Document> Documents{get;set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder){
-            modelBuilder.Entity<Document>().HasIndex( index=>index.Hash) .IsUnique();
-            modelBuilder.Entity<Document>().HasIndex( index=>index.Owner);
             modelBuilder.Entity<Document>().HasIndex( index=>index.When);
+            modelBuilder.Entity<Document>().Property("hash").HasColumnName("Hash");
+            modelBuilder.Entity<Document>().HasIndex("hash");
         }
     }
 }

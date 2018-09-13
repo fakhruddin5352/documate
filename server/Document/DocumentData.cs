@@ -1,10 +1,11 @@
 using System;
 using System.IO;
+using Documate.ValueObjects;
 
 namespace Documate.Document
 {
     public class DocumentData {
-        public DocumentData (string name, Stream data, DateTime createdOn, string hash) {
+        public DocumentData (string name, Stream data, DateTime createdOn, Hash hash) {
             this.Name = name;
             this.Data = data;
             this.CreatedOn = createdOn;
@@ -16,7 +17,7 @@ namespace Documate.Document
 
         public DateTime CreatedOn { get; }
 
-        public string Hash { get; }
+        public Hash Hash { get; }
 
     }
 }

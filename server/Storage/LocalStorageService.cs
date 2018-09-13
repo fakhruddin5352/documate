@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Documate.ValueObjects;
 using Microsoft.Extensions.Logging;
 
 namespace Documate.Storage {
@@ -12,7 +13,7 @@ namespace Documate.Storage {
             this.logger = logger;
         }
 
-        public Task<Stream> Load (string hash) {
+        public Task<Stream> Load (Hash hash) {
             string fullPath = string.Empty;
 
             fullPath = Path.Combine (path, hash);
@@ -24,7 +25,7 @@ namespace Documate.Storage {
             return Task.FromResult<Stream>(new FileStream (fullPath, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
-        public async Task<bool> Store (string hash, Stream stream) {
+        public async Task<bool> Store (Hash hash, Stream stream) {
             string fullPath = string.Empty;
             try {
                 fullPath = Path.Combine (path, hash);

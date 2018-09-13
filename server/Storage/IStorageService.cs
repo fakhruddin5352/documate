@@ -1,9 +1,10 @@
 using System.IO;
 using System.Threading.Tasks;
+using Documate.ValueObjects;
 
 namespace Documate.Storage {
     public interface IStorageService {
-        Task<bool> Store (string hash, Stream stream);
-        Task<Stream> Load (string hash);
+        Task<bool> Store (Hash hash, Stream stream);
+        Task<Stream> Load (Hash hash);
     }
 }

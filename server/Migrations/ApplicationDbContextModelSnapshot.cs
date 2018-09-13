@@ -24,13 +24,12 @@ namespace Documate.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Hash")
-                        .HasColumnType("character(64)");
-
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(256);
 
                     b.Property<string>("Owner")
+                        .IsRequired()
                         .HasColumnType("character(40)");
 
                     b.Property<string>("Verified")
@@ -40,14 +39,16 @@ namespace Documate.Migrations
 
                     b.Property<DateTime>("When");
 
+                    b.Property<string>("hash")
+                        .IsRequired()
+                        .HasColumnName("Hash")
+                        .HasColumnType("character(64)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Hash")
-                        .IsUnique();
-
-                    b.HasIndex("Owner");
-
                     b.HasIndex("When");
+
+                    b.HasIndex("hash");
 
                     b.ToTable("Documents");
                 });

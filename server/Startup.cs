@@ -8,6 +8,7 @@ using Documate.Crypto;
 using Documate.Data;
 using Documate.Document;
 using Documate.Storage;
+using Documate.ValueObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,7 +35,7 @@ namespace Documate {
             Configuration.Bind ("Contracts", contractsConfig);
 
             services.AddCrypto (options => options.UsePrivateKey (Configuration["Crypto:PrivateKey"])
-                .AddAdditionalSignatureItem (ModelItem.From (DataType.address, contractsConfig.Documate.Address)));
+                .AddAdditionalSignatureItem (Address.Of(contractsConfig.Documate.Address)));
             services.AddLocalStorage (options => options.UsePath (Configuration["Storage:Path"]));
             services.AddData (options => options.UseConnection (Configuration.GetConnectionString ("DefaultConnection")));
             services.AddBlockChain (options => options.UseRpcEndpoint (Configuration["BlockChain:RpcEndpoint"])

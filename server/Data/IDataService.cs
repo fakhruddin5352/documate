@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Documate.Data;
+using Documate.ValueObjects;
 
 namespace Documate.Data
 {
@@ -7,6 +8,6 @@ namespace Documate.Data
     {
          Task Save(Document document);
 
-         Task<Document> Load(string hash);
+         Task<Document> Load(Hash hash);
     }
 }

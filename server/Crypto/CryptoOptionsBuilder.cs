@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using Documate.ValueObjects;
 
 namespace Documate.Crypto {
     public class CryptoOptionsBuilder {
         public string PrivateKey { get; private set; }
 
-        public IList<ModelItem> AdditionalSignatureItems { get; private set; }
+        public IList<IDataType> AdditionalSignatureItems { get; private set; }
 
         public CryptoOptionsBuilder () {
-            AdditionalSignatureItems = new List<ModelItem> ();
+            AdditionalSignatureItems = new List<IDataType> ();
         }
 
         public CryptoOptionsBuilder UsePrivateKey (string privateKey) {
@@ -16,7 +17,7 @@ namespace Documate.Crypto {
             return this;
         }
 
-        public CryptoOptionsBuilder AddAdditionalSignatureItem (ModelItem item) {
+        public CryptoOptionsBuilder AddAdditionalSignatureItem (IDataType item) {
             AdditionalSignatureItems.Add (item);
             return this;
         }

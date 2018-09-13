@@ -1,12 +1,14 @@
+using Documate.ValueObjects;
+
 namespace Documate.Document
 {
     public class DocumentInfo {
-        public DocumentInfo (string hash, string signature) {
+        public DocumentInfo (Hash hash, Signature signature) {
             this.Hash = hash;
             this.Signature = signature;
 
         }
-        public string Hash { get; }
-        public string Signature { get; }
+        public Hash Hash { get; }
+        public Signature Signature { get; }
     }
 }

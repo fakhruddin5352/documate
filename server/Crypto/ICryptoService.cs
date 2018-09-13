@@ -1,7 +1,9 @@
+using Documate.ValueObjects;
+
 namespace Documate.Crypto {
     public interface ICryptoService {
-        RecoverModel EcRecover (string sender, string signature, string hash);
-        RecoverModel EcRecover (string sender, string signature, byte[] data);
-        string Sign (Model model);
+        RecoverModel EcRecover (Address sender, Signature signature, Hash hash);
+        RecoverModel EcRecover (Address sender, Signature signature, byte[] data);
+        Signature Sign (Model model);
     }
 }

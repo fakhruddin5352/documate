@@ -4,6 +4,7 @@ using Documate.BlockChain;
 using Documate.Crypto;
 using Documate.Data;
 using Documate.Storage;
+using Documate.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Nethereum.Hex.HexConvertors.Extensions;
 
@@ -29,7 +30,7 @@ namespace Documate.Document
             this.logger = logger ??
                 throw new System.ArgumentNullException (nameof (logger));
         }
-        public async Task<DocumentData> Load (string sender, string signature, string hash) {
+        public async Task<DocumentData> Load (Address sender, Signature signature, Hash hash) {
             Verify (sender, signature, hash);
 
             var document = await dataService.Load (hash);
@@ -44,14 +45,14 @@ namespace Documate.Document
             return new DocumentData (document.Name, stream, document.When, document.Hash);
         }
 
-        public async Task<DocumentInfo> Store (string sender, string signature, byte[] data, string name) {
-            string hash = Verify (sender, signature, data);
+        public async Task<DocumentInfo> Store (Address sender, Signature signature, byte[] data, string name) {
+            var hash = Verify (sender, signature, data);
             await Save (sender, hash, data, name);
             var serverSignature = Sign (sender, hash);
             return new DocumentInfo (hash, serverSignature);
         }
 
-        private async Task Save (string sender, string hash, byte[] data, string name) {
+        private async Task Save (Address sender, Hash hash, byte[] data, string name) {
             var document = await dataService.Load (hash);
             if (document == null) {
                 document = new Data.Document () {
@@ -60,7 +61,7 @@ namespace Documate.Document
                 Name = name
                 };
                 using (var ms = new MemoryStream (data)) {
-                    if (!await storageService.Store (hash, ms)) {
+                    if (!await storageService.Store (hash, ms)) { 
                         throw new StorageException ();
                     }
                 }
@@ -68,26 +69,23 @@ namespace Documate.Document
             }
         }
 
-        private string Sign (string sender, string hash) {
-            var signature = cryptoService.Sign (Model.FromItems (
-                ModelItem.From (DataType.bytes32, hash.HexToByteArray ()),
-                ModelItem.From (DataType.address, sender)
-            ));
+        private Signature Sign (Address sender, Hash hash) {
+            var signature = cryptoService.Sign (Model.FromItems (hash,sender));
             return signature;
         }
 
-        private string Verify (string sender, string signature, byte[] data) {
+        private Hash Verify (Address sender, Signature signature, byte[] data) {
             var recoverModel = cryptoService.EcRecover (sender, signature, data);
             var valid = (sender == recoverModel.Signer);
             if (!recoverModel.Valid)
-                throw new InvalidSignatureException ();
+                throw new UnAuthorizedAccessException ();
             return recoverModel.Hash;
         }
-        private string Verify (string sender, string signature, string hash) {
+        private Hash Verify (Address sender, Signature signature, Hash hash) {
             var recoverModel = cryptoService.EcRecover (sender, signature, hash);
             var valid = (sender == recoverModel.Signer);
             if (!recoverModel.Valid)
-                throw new InvalidSignatureException ();
+                throw new UnAuthorizedAccessException ();
             return recoverModel.Hash;
         }
 
