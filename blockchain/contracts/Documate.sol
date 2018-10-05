@@ -1,19 +1,23 @@
 pragma solidity ^0.4.24;
 
-import "./Publisher.sol";
 import "./Document.sol";
 
 contract Documate {
 
     address public serverAddress;
     address public publisherAddress;
+    address public presenterAddress;
+    address public issuerAddress;
     mapping(bytes32 => address) public documents;
+    mapping(address => address[]) owned;
 
     event DocumentCreated(address document);
 
-    constructor(address publisher, address server) public{
+    constructor(address publisher, address presenter, address issuer, address server) public{
         publisherAddress = publisher;
         serverAddress = server;
+        presenterAddress = presenter;
+        issuerAddress = issuer;
     }
 
     modifier validSignature(bytes32 document, bytes memory signature) {
@@ -23,8 +27,9 @@ contract Documate {
     }
     function createDocument(string name, bytes32 documentHash, bytes memory signature) public validSignature(documentHash,signature) 
          returns (address) {
-        Document document = (new Document(publisherAddress,msg.sender,name , documentHash));
+        Document document = (new Document(publisherAddress,presenterAddress, issuerAddress, msg.sender,name , documentHash));
         documents[documentHash] = address(document);
+        owned[msg.sender].push(address(document));
         emit DocumentCreated(document);
         return address(document);
     }
@@ -34,7 +39,7 @@ contract Documate {
         return document.canView(by);
     }
 
-    function getSigner(bytes32 document, bytes memory signature) public view returns (address){
+    function getSigner(bytes32 document, bytes memory signature) internal view returns (address){
         bytes memory packed = abi.encodePacked(document, msg.sender, address(this));
         bytes32 hash = keccak256(packed);
         bytes32 message = prefixed(hash);
